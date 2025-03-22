@@ -1,0 +1,19 @@
+meta {
+  name: direct-auth-test
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/test
+  body: none
+  auth: direct
+}
+
+headers {
+  Authorization: Bearer direct-token
+} 
+
+auth:bearer {
+  token: 123
+}

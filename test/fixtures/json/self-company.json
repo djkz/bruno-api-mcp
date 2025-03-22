@@ -1,0 +1,15 @@
+{
+  "meta": {
+    "name": "self-company",
+    "type": "http",
+    "seq": 1
+  },
+  "http": {
+    "request": {
+      "method": "get",
+      "url": "{{baseUrl}}/api",
+      "body": "none",
+      "auth": "inherit"
+    }
+  }
+}
