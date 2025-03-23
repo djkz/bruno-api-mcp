@@ -2,6 +2,24 @@
 
 A Model Context Protocol (MCP) server that exposes Bruno API collections as MCP tools. This server allows you to interact with your Bruno API collections through the MCP protocol, making your API collections accessible to AI agents and other MCP clients.
 
+## Why This Matters: Source Code and Data Working Together
+
+When developers need to integrate APIs, they typically face three core challenges:
+
+1. **Debugging across system boundaries**: Diagnosing issues across separate code and data environments requires constant context switching, making troubleshooting inefficient.
+
+2. **Creating custom tooling**: Each third-party API integration requires building and maintaining custom tooling, causing development overhead and technical debt.
+
+3. **Building service UIs**: Developing user interfaces for every backend service adds significant complexity and maintenance costs.
+
+This server solves these precise problems by collocating your source code with your data. It transforms Bruno API collections into Model Context Protocol tools, enabling you to:
+
+- Debug across previously separate environments with complete context
+- Turn any API into an agent-ready tool without additional custom development
+- Build headless services that can be controlled through AI interfaces
+
+For development teams that need to accelerate API integration while reducing maintenance overhead, this approach fundamentally changes what's possible - making previously complex integrations straightforward and accessible.
+
 ## Features
 
 - Automatic conversion of Bruno API collections to MCP tools
