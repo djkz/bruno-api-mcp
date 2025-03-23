@@ -7,6 +7,7 @@ import {
   envToJson,
   collectionBruToJson,
 } from "./bruno-lang/brulang.js";
+import { applyAuthToParsedRequest } from "./auth/index.js";
 
 const log = debug("bruno-parser");
 const debugReq = debug("bruno-request");
@@ -492,7 +493,7 @@ export class BrunoParser {
     console.log("originalEnvVars", originalEnvVars);
 
     try {
-      const { method, headers, body, queryParams, rawRequest } = parsedRequest;
+      const { method, body, queryParams, rawRequest } = parsedRequest;
       const { variables, ...requestParams } = params;
 
       // Apply any custom variables if provided
@@ -514,12 +515,38 @@ export class BrunoParser {
       // Add query parameters that are not already in the URL
       const urlObj = new URL(finalUrl);
 
+      // Apply authentication using our new auth module
+      const authResult = applyAuthToParsedRequest(
+        rawRequest,
+        this.parsedCollection,
+        this.envVars
+      );
+
+      // Merge any headers from auth with existing headers from parsedRequest
+      const headers = {
+        ...parsedRequest.headers,
+        ...authResult.headers,
+      };
+
       // Apply parameters to query parameters
       if (queryParams) {
         Object.entries(requestParams).forEach(([key, value]) => {
           if (Object.prototype.hasOwnProperty.call(queryParams, key)) {
             queryParams[key] = String(value);
           }
+        });
+      }
+
+      // Add all query parameters to URL, including those from auth
+      // First add existing query params from the request
+      Object.entries(queryParams).forEach(([key, value]) => {
+        urlObj.searchParams.set(key, value);
+      });
+
+      // Then add auth query params if any
+      if (authResult.queryParams) {
+        Object.entries(authResult.queryParams).forEach(([key, value]) => {
+          urlObj.searchParams.set(key, value);
         });
       }
 
