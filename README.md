@@ -21,18 +21,48 @@ A Model Context Protocol (MCP) server that exposes Bruno API collections as MCP 
 2. Start the server with your Bruno API collection:
 
    ```
-   node --loader ts-node/esm src/index.ts --bruno-path /path/to/bruno/collection [--environment env_name]
+   node --loader ts-node/esm src/index.ts --bruno-path /path/to/bruno/collection [--environment env_name] [--include-tools tool1,tool2,tool3] [--exclude-tools tool4,tool5]
    ```
 
    Options:
 
    - `--bruno-path` or `-b`: Path to your Bruno API collection directory (required)
    - `--environment` or `-e`: Name of the environment to use (optional)
+   - `--include-tools`: Comma-separated list of tool names to include, filtering out all others (optional)
+   - `--exclude-tools`: Comma-separated list of tool names to exclude (optional)
+
+   Both formats are supported for the tool filtering options:
+
+   ```
+   --include-tools tool1,tool2,tool3    # Space-separated format
+   --include-tools=tool1,tool2,tool3    # Equals-sign format
+   ```
 
 3. Connect from clients:
    - Local connection: `http://localhost:8000/sse`
    - From Windows to WSL: `http://<WSL_IP>:8000/sse`
    - Get your WSL IP with: `hostname -I | awk '{print $1}'`
+
+## Predefined Scripts
+
+The repository includes several predefined npm scripts for common use cases:
+
+```bash
+# Start the server with default settings
+npm start
+
+# Start with CFI API path
+npm run start:cfi
+
+# Start with local environment
+npm run start:local
+
+# Start with only specific tools included
+npm run start:include-tools
+
+# Start with specific tools excluded
+npm run start:exclude-tools
+```
 
 ## Development
 

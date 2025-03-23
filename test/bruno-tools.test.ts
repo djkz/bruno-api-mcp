@@ -91,6 +91,45 @@ describe("Bruno Tools", () => {
     });
   });
 
+  test("should include only tools in the includeTools list", async () => {
+    // First, get all available tool names
+    const allTools = await createBrunoTools({
+      collectionPath: collectionPath,
+    });
+
+    // Select one tool name to include
+    const toolNameToInclude = allTools[0].name;
+
+    const tools = await createBrunoTools({
+      collectionPath: collectionPath,
+      includeTools: [toolNameToInclude],
+    });
+
+    // Should only include the one specified tool
+    expect(tools.length).toBe(1);
+    expect(tools[0].name).toBe(toolNameToInclude);
+  });
+
+  test("should exclude tools in the excludeTools list", async () => {
+    // First, get all available tool names
+    const allTools = await createBrunoTools({
+      collectionPath: collectionPath,
+    });
+
+    // Select first tool name to exclude
+    const toolNameToExclude = allTools[0].name;
+    const totalToolCount = allTools.length;
+
+    const tools = await createBrunoTools({
+      collectionPath: collectionPath,
+      excludeTools: [toolNameToExclude],
+    });
+
+    // Should include all tools except the excluded one
+    expect(tools.length).toBe(totalToolCount - 1);
+    expect(tools.some((tool) => tool.name === toolNameToExclude)).toBe(false);
+  });
+
   test("should execute a request when handler is called", async () => {
     // Skip this test for now as it requires more complex mocking of axios
     // In a real implementation, we would use nock or another library to mock HTTP requests

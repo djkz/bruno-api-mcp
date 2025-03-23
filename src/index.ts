@@ -25,6 +25,57 @@ const environment =
     ? process.argv[envIndex + 1]
     : null;
 
+// Check for include-tools parameter
+const includeToolsArg = process.argv.find(
+  (arg) => arg.startsWith("--include-tools=") || arg === "--include-tools"
+);
+let includeTools: string[] | null = null;
+
+if (includeToolsArg) {
+  if (includeToolsArg.includes("=")) {
+    // Format: --include-tools=tool1,tool2
+    const toolsString = includeToolsArg.split("=")[1];
+    if (toolsString) {
+      includeTools = toolsString.split(",");
+    }
+  } else {
+    // Format: --include-tools tool1,tool2
+    const idx = process.argv.indexOf(includeToolsArg);
+    if (idx !== -1 && idx < process.argv.length - 1) {
+      includeTools = process.argv[idx + 1].split(",");
+    }
+  }
+}
+
+// Check for exclude-tools parameter
+const excludeToolsArg = process.argv.find(
+  (arg) => arg.startsWith("--exclude-tools=") || arg === "--exclude-tools"
+);
+let excludeTools: string[] | null = null;
+
+if (excludeToolsArg) {
+  if (excludeToolsArg.includes("=")) {
+    // Format: --exclude-tools=tool1,tool2
+    const toolsString = excludeToolsArg.split("=")[1];
+    if (toolsString) {
+      excludeTools = toolsString.split(",");
+    }
+  } else {
+    // Format: --exclude-tools tool1,tool2
+    const idx = process.argv.indexOf(excludeToolsArg);
+    if (idx !== -1 && idx < process.argv.length - 1) {
+      excludeTools = process.argv[idx + 1].split(",");
+    }
+  }
+}
+
+// For debugging only
+if (process.env.DEBUG) {
+  console.log("[DEBUG] Command line arguments:", process.argv);
+  console.log("[DEBUG] Parsed includeTools:", includeTools);
+  console.log("[DEBUG] Parsed excludeTools:", excludeTools);
+}
+
 const brunoApiPath = argBrunoApiPath || defaultBrunoApiPath;
 
 // Create server instance
@@ -183,10 +234,23 @@ async function loadInitialBrunoApi() {
     try {
       console.log(`Loading Bruno API tools from ${brunoApiPath}...`);
 
-      const tools = await createBrunoTools({
+      const toolOptions = {
         collectionPath: brunoApiPath + "/collection.bru",
         environment: environment || undefined,
-      });
+        includeTools: includeTools || undefined,
+        excludeTools: excludeTools || undefined,
+      };
+
+      // Log filter settings
+      if (includeTools && includeTools.length > 0) {
+        console.log(`Including only these tools: ${includeTools.join(", ")}`);
+      }
+
+      if (excludeTools && excludeTools.length > 0) {
+        console.log(`Excluding these tools: ${excludeTools.join(", ")}`);
+      }
+
+      const tools = await createBrunoTools(toolOptions);
 
       // Register each tool with the server
       let registeredCount = 0;
@@ -277,6 +341,12 @@ loadInitialBrunoApi().then(() => {
       console.log(`Loaded Bruno API tools from: ${brunoApiPath}`);
       if (environment) {
         console.log(`Using environment: ${environment}`);
+      }
+      if (includeTools && includeTools.length > 0) {
+        console.log(`Including only these tools: ${includeTools.join(", ")}`);
+      }
+      if (excludeTools && excludeTools.length > 0) {
+        console.log(`Excluding these tools: ${excludeTools.join(", ")}`);
       }
     } else {
       console.log(

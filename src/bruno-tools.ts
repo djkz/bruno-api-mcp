@@ -27,6 +27,8 @@ export interface BrunoToolsOptions {
   collectionPath: string;
   environment?: string;
   filterRequests?: (name: string) => boolean;
+  includeTools?: string[];
+  excludeTools?: string[];
 }
 
 /**
@@ -37,7 +39,13 @@ export interface BrunoToolsOptions {
 export async function createBrunoTools(
   options: BrunoToolsOptions
 ): Promise<BrunoTool[]> {
-  const { collectionPath, environment, filterRequests } = options;
+  const {
+    collectionPath,
+    environment,
+    filterRequests,
+    includeTools,
+    excludeTools,
+  } = options;
 
   if (!collectionPath) {
     throw new Error("Collection path is required");
@@ -73,6 +81,26 @@ export async function createBrunoTools(
 
       // Generate a unique tool name
       const toolName = createToolName(parsedRequest.name);
+
+      // Skip if not in includeTools list (if provided)
+      if (
+        includeTools &&
+        includeTools.length > 0 &&
+        !includeTools.includes(toolName)
+      ) {
+        log(`Skipping tool ${toolName} - not in includeTools list`);
+        continue;
+      }
+
+      // Skip if in excludeTools list (if provided)
+      if (
+        excludeTools &&
+        excludeTools.length > 0 &&
+        excludeTools.includes(toolName)
+      ) {
+        log(`Skipping tool ${toolName} - in excludeTools list`);
+        continue;
+      }
 
       // Create our standardized schema
       const schema = {

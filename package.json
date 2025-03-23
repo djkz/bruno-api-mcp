@@ -12,6 +12,8 @@
     "start": "node --loader ts-node/esm src/index.ts",
     "start:cfi": "node --loader ts-node/esm src/index.ts --bruno-path /home/tima/cfi/us-app/doc/api/CFI-APi",
     "start:local": "NODE_OPTIONS='--loader ts-node/esm --experimental-specifier-resolution=node' node src/index.ts --bruno-path /home/tima/cfi/us-app/doc/api/CFI-APi --environment local",
+    "start:include-tools": "NODE_OPTIONS='--loader ts-node/esm --experimental-specifier-resolution=node' node src/index.ts --bruno-path /home/tima/cfi/us-app/doc/api/CFI-APi --environment local --include-tools=deals_list,loan,loans_list,self_company",
+    "start:exclude-tools": "NODE_OPTIONS='--loader ts-node/esm --experimental-specifier-resolution=node' node src/index.ts --bruno-path /home/tima/cfi/us-app/doc/api/CFI-APi --environment local --exclude-tools=deal_create_input_company,deal_create_land_company",
     "test": "node --no-warnings --experimental-vm-modules --loader ts-node/esm node_modules/jest/bin/jest.js --testMatch=\"**/test/**/*.ts\"",
     "test:silent": "node --no-warnings --experimental-vm-modules --loader ts-node/esm node_modules/jest/bin/jest.js --testMatch=\"**/test/**/*.ts\" --silent",
     "test:watch": "node --no-warnings --experimental-vm-modules --loader ts-node/esm node_modules/jest/bin/jest.js --testMatch=\"**/test/**/*.ts\" --watch"
