@@ -155,6 +155,34 @@ And you provide `{ "variables": { "dealId": "abc123" } }`, the actual URL used w
 https://api.example.com/api/deal/abc123
 ```
 
+### Query Parameters
+
+You can add or override query parameters directly:
+
+```json
+{
+  "query": {
+    "limit": "10",
+    "offset": "20",
+    "search": "keyword"
+  }
+}
+```
+
+This will add these query parameters to the URL regardless of whether they are defined in the original request. For example, if your request URL is:
+
+```
+{{baseUrl}}/api/deals
+```
+
+And you provide `{ "query": { "limit": "10", "search": "keyword" } }`, the actual URL used will be:
+
+```
+https://api.example.com/api/deals?limit=10&search=keyword
+```
+
+This approach is cleaner and more explicit than using variables to override query parameters.
+
 ### Custom Body Parameters
 
 You can also provide custom parameters in the request body:
@@ -170,7 +198,7 @@ You can also provide custom parameters in the request body:
 
 ### Complete Example
 
-Here's a complete example combining all three types of customization:
+Here's a complete example combining all four types of customization:
 
 ```json
 {
@@ -178,6 +206,10 @@ Here's a complete example combining all three types of customization:
   "variables": {
     "dealId": "abc123",
     "apiKey": "test-key-staging"
+  },
+  "query": {
+    "limit": "5",
+    "sort": "created_at"
   },
   "body": {
     "status": "approved",

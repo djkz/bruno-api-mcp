@@ -346,6 +346,41 @@ export class BrunoParser {
 
     // Parse query parameters
     const queryParams: Record<string, string> = {};
+
+    // Parse from params:query section (new format)
+    if (rawRequest.params) {
+      // Check if params is an array (from paramsquery handler)
+      if (Array.isArray(rawRequest.params)) {
+        // Find query parameters in params array
+        const queryParamsArray = rawRequest.params.filter(
+          (param: any) => param.type === "query"
+        );
+        for (const param of queryParamsArray) {
+          if (param.enabled !== false && param.name) {
+            queryParams[param.name] = this.processTemplateVariables(
+              param.value || ""
+            );
+          }
+        }
+      } else if (rawRequest.params.query) {
+        // Handle legacy structure
+        if (Array.isArray(rawRequest.params.query)) {
+          for (const param of rawRequest.params.query) {
+            if (param.enabled !== false && param.name) {
+              queryParams[param.name] = this.processTemplateVariables(
+                param.value || ""
+              );
+            }
+          }
+        } else if (typeof rawRequest.params.query === "object") {
+          Object.entries(rawRequest.params.query).forEach(([name, value]) => {
+            queryParams[name] = this.processTemplateVariables(String(value));
+          });
+        }
+      }
+    }
+
+    // Parse from http.query section (backward compatibility)
     if (rawRequest.http && rawRequest.http.query) {
       for (const param of rawRequest.http.query) {
         if (param.enabled !== false && param.name) {
@@ -485,6 +520,7 @@ export class BrunoParser {
     parsedRequest: ParsedRequest,
     params: {
       variables?: Record<string, any>;
+      query?: Record<string, string>;
       body?: any;
     } = {}
   ): Promise<BrunoResponse> {
@@ -494,7 +530,7 @@ export class BrunoParser {
 
     try {
       const { method, body, queryParams, rawRequest } = parsedRequest;
-      const { variables, ...requestParams } = params;
+      const { variables, query, ...requestParams } = params;
 
       // Apply any custom variables if provided
       if (variables && typeof variables === "object") {
@@ -502,6 +538,11 @@ export class BrunoParser {
         // Temporarily override environment variables
         Object.entries(variables).forEach(([key, value]) => {
           this.envVars[key] = String(value);
+
+          // If a variable matches a query parameter name, update the query parameter as well
+          if (Object.prototype.hasOwnProperty.call(queryParams, key)) {
+            queryParams[key] = String(value);
+          }
         });
       }
 
@@ -534,6 +575,16 @@ export class BrunoParser {
           if (Object.prototype.hasOwnProperty.call(queryParams, key)) {
             queryParams[key] = String(value);
           }
+        });
+      }
+
+      // Add dedicated query parameters if provided
+      if (query && typeof query === "object") {
+        debugReq(
+          `Applying dedicated query parameters: ${JSON.stringify(query)}`
+        );
+        Object.entries(query).forEach(([key, value]) => {
+          queryParams[key] = String(value);
         });
       }
 

@@ -205,6 +205,12 @@ async function loadInitialBrunoApi() {
                 .record(z.string(), z.string())
                 .optional()
                 .describe("Optional variables to override for this request"),
+              query: z
+                .record(z.string(), z.string())
+                .optional()
+                .describe(
+                  "Optional query parameters to add to the request URL"
+                ),
               body: z
                 .object({})
                 .passthrough()

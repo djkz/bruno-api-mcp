@@ -1,0 +1,23 @@
+meta {
+  name: deals-list
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/deals?limit=10
+  body: none
+  auth: inherit
+}
+
+params:query {
+  limit: 10
+}
+
+docs {
+  You can use the following query params:
+    # Search term for filtering deals by name, applicant, borrower, etc.
+    search: 
+    # Limit the number of results (max: 5000, default: 20 if not specified)
+    limit: 
+}

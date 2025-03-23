@@ -9,6 +9,7 @@ export interface BrunoToolSchema {
   environment?: string;
   variables?: Record<string, string>;
   body?: Record<string, any>;
+  query?: Record<string, string>;
 }
 
 // Tool interface for MCP protocol
@@ -86,12 +87,29 @@ export async function createBrunoTools(
           },
           description: "Optional variables to override for this request",
         },
+        query: {
+          type: "object",
+          additionalProperties: {
+            type: "string",
+          },
+          description: "Optional query parameters to add to the request URL",
+        },
         body: {
           type: "object",
           description: "Request body parameters",
           additionalProperties: true,
         },
       };
+
+      // Build tool description
+      let description = `Execute ${parsedRequest.method} request to ${
+        parsedRequest.rawRequest?.http?.url || parsedRequest.url
+      }`;
+
+      // Add documentation if available
+      if (parsedRequest.rawRequest?.docs) {
+        description += "\n\n" + parsedRequest.rawRequest.docs;
+      }
 
       // Create the tool handler
       const handler = async (params: BrunoToolSchema) => {
@@ -143,9 +161,7 @@ export async function createBrunoTools(
       // Add the tool to the list
       tools.push({
         name: toolName,
-        description: `Execute ${parsedRequest.method} request to ${
-          parsedRequest.rawRequest?.http?.url || parsedRequest.url
-        }`,
+        description,
         schema,
         handler,
       });
