@@ -1,0 +1,50 @@
+meta {
+  name: V2-deals-show
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/v2/deals/{{deal_id}}
+  body: none
+  auth: inherit
+}
+
+params:query {
+  include: {{include_param}}
+}
+
+headers {
+  Content-Type: application/vnd.api+json
+  Authorization: Bearer {{access_token_set_by_collection_script}}
+}
+
+vars:pre-request {
+  deal_id: 27160
+  include_param: comments
+}
+
+assert {
+  res.status: eq 200
+  res.body.data.id: isDefined
+  res.body.data.type: eq "deals"
+}
+
+docs {
+  # Deal Show Endpoint
+  
+  This endpoint retrieves a single deal by ID.
+  
+  ## Authentication
+  
+  Requires a valid OAuth token with the following scopes:
+  - read:deals
+  
+  ## Parameters
+  
+  - `deal_id`: The ID of the deal to retrieve
+  
+  ## Response
+  
+  Returns a JSON:API formatted response with the deal data and any requested included resources.
+}

@@ -1,0 +1,21 @@
+meta {
+  name: API V2 OAuth Workflow
+}
+
+auth {
+  mode: oauth2
+}
+
+auth:oauth2 {
+  grant_type: client_credentials
+  access_token_url: {{base_url}}/v3/oauth/token
+  client_id: {{client_id}}
+  client_secret: {{client_secret}}
+  scope: 
+}
+
+script:post-response {
+  if(req.getAuthMode() == 'oauth2' && res.body.access_token) {
+      bru.setVar('access_token_set_by_collection_script', res.body.access_token);
+  }
+}

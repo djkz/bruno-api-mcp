@@ -604,19 +604,7 @@ export class BrunoParser {
       finalUrl = urlObj.toString();
 
       // Process body content with parameters if it's JSON
-      let requestData = body?.content;
-
-      if (body?.type === "json" && typeof body.content === "object") {
-        try {
-          // Merge params into body content if it's an object
-          requestData = {
-            ...body.content,
-            ...requestParams,
-          };
-        } catch (error) {
-          debugReq("Error applying parameters to request body:", error);
-        }
-      }
+      let requestData = params.body;
 
       debugReq(`Executing ${method} request to ${finalUrl}`);
       debugReq(`Headers: ${JSON.stringify(headers)}`);
